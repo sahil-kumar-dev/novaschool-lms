@@ -1,3 +1,4 @@
+import { HtmlContext } from 'next/dist/server/future/route-modules/app-page/vendored/contexts/entrypoints'
 import nodemailer from 'nodemailer'
 
 const transporter = nodemailer.createTransport({
@@ -10,13 +11,13 @@ const transporter = nodemailer.createTransport({
     },
 })
 
-export async function sendOtp(to: string, otp: string) {
+export async function sendOtp(to: string, otp:any) {
     const mailOptions = {
         from: 'NOVASCHOOL <noreply@novaschool.com>',
         to,
         subject: 'Your OTP for LMS Signup',
         text: `Your OTP is: ${otp}. It will expire in 10 minutes.`,
-        html: `<p>Your OTP is: <strong>${otp}</strong></p><p>It will expire in 10 minutes.</p>`,
+        html: otp,
     }
 
     await transporter.sendMail(mailOptions)

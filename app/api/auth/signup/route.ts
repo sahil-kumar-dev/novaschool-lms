@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcryptjs'
 import { sendOtp } from '@/app/lib/mail'
+import otpTemplate from '@/mailTemplates/otpTemplate'
 
 const prisma = new PrismaClient()
 
@@ -29,17 +30,19 @@ export async function POST(req: Request) {
             await prisma.otp.delete({ where: { email } })
         }
 
+        const hashedOtp = await hash(otp, 12)
+
         await prisma.otp.create({
             data: {
                 email,
-                otp,
+                otp:hashedOtp,
                 otpExpires: new Date(Date.now() + 10 * 60 * 1000), // OTP expires in 10 minutes
             },
         })
 
         console.log(otp)
         // Send OTP email
-        await sendOtp(email, otp)
+        await sendOtp(email, otpTemplate(otp))
 
         return NextResponse.json({ message: 'Signup successful. Please check your email for OTP.' })
     } catch (error) {

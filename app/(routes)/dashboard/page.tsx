@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function Component() {
     const router = useRouter()
@@ -9,6 +10,8 @@ export default function Component() {
     const handleLogout = async () => {
         const response = await fetch('/api/auth/logout', { method: 'POST' })
         if (response.ok) {
+            toast.success('Logged out successfully')
+            localStorage.setItem('token', '')
             router.push('/login')
         }
     }

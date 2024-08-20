@@ -14,11 +14,38 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  fullName   String
-  email      String   @unique
-  phone      String?
-  password   String
+  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
+  fullName             String
+  email                String       @unique
+  mobileNumber         String?
+  thumbnail            String?
+  password             String
+  accountType          String       @default("student")
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  createdAt            DateTime     @default(now())
+  coureses             Enrollment[]
+}
+
+model Course {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  description      String
+  price            Int
+  image            String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now())
+  studentsEnrolled Enrollment[]
+}
+
+model Enrollment {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String @db.ObjectId
+  courseId String @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
 }
 
 model Otp {

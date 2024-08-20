@@ -2,32 +2,30 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useLoginMutation } from '@/app/lib/api'
+import { toast } from 'sonner'
 
 export default function Component() {
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('password')
+    const [password, setPassword] = useState('')
     const router = useRouter()
+
+    const [login,{isLoading,isError}] = useLoginMutation()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        })
-        const data = await response.json()
-
-        console.log(response)
-
-        if (response.ok) {
-
-            localStorage.setItem('token', data.token)
+        try {
+            const response = await login({ email, password }).unwrap()
+        
+            localStorage.setItem('token', response.token)
             // console.log('executed')
             router.push('/dashboard')
             // console.log('executed')
-
-        } else {
-            alert(data.error)
+            
+            toast.success(response.message)
+            
+        } catch (error:any) {
+            toast.error(error?.data?.error)
         }
     }
 
@@ -63,7 +61,7 @@ export default function Component() {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-                Log in
+                {isLoading ?'Logging In':'Login'}
             </button>
         </form>
     )

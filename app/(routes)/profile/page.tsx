@@ -1,61 +1,58 @@
-import React from 'react'
+'use client'
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useRouter } from 'next/navigation'
+import { useGetProfileQuery } from '@/app/lib/api'
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useEffect, useState } from 'react'
 
-export default function Component() {
+export default function ProfilePage() {
+    const router = useRouter()
+    interface ProfileData {
+      fullName: string;
+      email: string;
+      thumbnail: string;
+      mobileNumber: string;
+      accountType: string;
+    }
+
+    // const [profile, setProfile] = useState<ProfileData | undefined>(undefined);
+    // const [isLoading, setIsLoading] = useState(false)
+
+    const { data:profile, isLoading, error } = useGetProfileQuery();
+    // useEffect(() => {
+    //   setProfile(profile);
+    //   setIsLoading(isLoading)
+    // }, [isLoading]);
+    
+
+
+    if (isLoading) return <div>Loading...</div>
+    if (error) return <div>Error loading profile</div>
+
     return (
-        <Card className="w-full max-w-3xl mx-auto p-6 sm:p-8 md:p-10">
-            <CardHeader>
-                <CardTitle className="text-3xl font-bold">Profile</CardTitle>
-                <CardDescription>Update your personal information.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="grid gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="firstName">First Name</Label>
-                            <Input id="firstName" placeholder="John" />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" placeholder="Doe" />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" placeholder="john@example.com" />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="phone">Phone</Label>
-                            <Input id="phone" type="tel" placeholder="+1 (555) 555-5555" />
-                        </div>
-                    </div>
-                    <div className="grid gap-4 items-center">
-                        <div className="grid gap-2">
-                            <Label htmlFor="profilePicture">Profile Picture</Label>
-                            <Input id="profilePicture" type="file" />
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <Avatar className="h-24 w-24">
-                                <AvatarImage src="/placeholder-user.jpg" alt="@shadcn" />
-                                <AvatarFallback>JD</AvatarFallback>
-                            </Avatar>
-                            <div className="grid gap-1">
-                                <div className="text-lg font-medium">John Doe</div>
-                                <div className="text-sm text-muted-foreground">john@example.com</div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </CardContent>
-            <CardFooter>
-                <div className="flex justify-end">
-                    <Button>Save Changes</Button>
+        <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+            <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
+            <div className="flex items-center space-x-4 mb-6">
+                <Avatar className="h-20 w-20">
+                    <AvatarImage src={profile?.thumbnail} alt={profile?.fullName} />
+                    <AvatarFallback>{profile?.fullName.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                    <h2 className="text-xl font-semibold">{profile?.fullName}</h2>
+                    <p className="text-gray-600">{profile?.email}</p>
                 </div>
-            </CardFooter>
-        </Card>
+            </div>
+            <div className="space-y-2">
+                <p><strong>Mobile:</strong> {profile?.mobileNumber || 'Not provided'}</p>
+                <p><strong>Account Type:</strong> {profile?.accountType}</p>
+            </div>
+            <Button
+                onClick={() => router.push('/profile/edit')}
+                className="mt-6"
+            >
+                Edit Profile
+            </Button>
+        </div>
     )
 }
