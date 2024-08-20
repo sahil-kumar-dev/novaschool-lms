@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
+import {hash} from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -16,12 +17,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 })
         }
 
+        const hashedPassword = await hash(password, 10)
+
         // Activate user
         const user = await prisma.user.create({
             data: {
                 email,
                 fullName,
-                password,
+                password:hashedPassword,
             }
         })
 
