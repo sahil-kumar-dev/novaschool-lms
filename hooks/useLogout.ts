@@ -17,7 +17,7 @@ export function useLogout() {
             // Reset the RTK Query cache
             dispatch(resetApiState())
             // Redirect to login page
-            router.push('/login')
+            router.push('/')
         } catch (error) {
             console.error('Logout failed:', error)
         }

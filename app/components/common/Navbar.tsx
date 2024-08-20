@@ -10,15 +10,26 @@ import { useEffect, useState } from 'react';
 import Link from "next/link";
 import CtaButton from "../helper/CtaButton";
 import { useGetProfileQuery } from "@/app/lib/api";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useLogout } from "@/hooks/useLogout";
+
 
 const Navbar = () => {
 
     const [prevScrollPos, setPrevScrollPos] = useState(0);
     const [visible, setVisible] = useState(true);
 
+    const logout = useLogout()
+
     const { data: profile, isLoading, isError } = useGetProfileQuery()
 
-    console.log(profile)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -47,18 +58,42 @@ const Navbar = () => {
                 <div className="flex gap-4 items-center">
                     {
                         profile &&
-                        <Link href={'/dashboard'}>
-                            <div className="flex gap-2 items-center">
-                                <Image
-                                    src={profile?.thumbnail || ''}
-                                    alt='profile'
-                                    width={40}
-                                    height={40}
-                                    className='rounded-full'
-                                />
-                            </div>
-                        </Link>
 
+                        // <Link href={'/dashboard'}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <div className="flex gap-2 items-center">
+                                    <Image
+                                        src={profile?.thumbnail || ''}
+                                        alt='profile'
+                                        width={40}
+                                        height={40}
+                                        className='rounded-full'
+                                    />
+                                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                    <Link href={'/profile'}>
+                                        Profile
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href={'/courses'}>
+                                        My Courses
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <button onClick={logout}>
+                                        Logout
+                                    </button>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        // {/* </Link> */}
                     }
                     {
                         !profile &&

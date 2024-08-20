@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import LoginForm from '@/app/components/auth/LoginForm'
+import Link from 'next/link'
 
 export default function LoginContent() {
     return (
@@ -33,9 +34,9 @@ export default function LoginContent() {
                     >
                         <p className="text-sm text-gray-600">
                             Don't have an account?{' '}
-                            <a href="/signup" className="text-indigo-600 hover:text-indigo-800 font-medium">
+                            <Link href="/signup" className="text-indigo-600 hover:text-indigo-800 font-medium">
                                 Sign up
-                            </a>
+                            </Link>
                         </p>
                     </motion.div>
                 </div>
