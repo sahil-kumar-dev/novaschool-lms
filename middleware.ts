@@ -4,7 +4,6 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
     const token = request.cookies.get('token')?.value
 
-    console.log(token)
 
     // If the user is logged in and trying to access login or signup pages
     if (token && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
@@ -20,5 +19,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/courses/:path*'],
+    matcher: ['/dashboard/:path*', '/courses/:path*','/profile:path*'],
 }

@@ -9,7 +9,10 @@ export async function POST(req: Request) {
     const user = { id: '1', email, password: await bcrypt.hash('password', 10) }
 
     if (!user) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404 }
+        )
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)

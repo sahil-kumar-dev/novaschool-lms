@@ -22,9 +22,9 @@ export default function Component() {
         if (response.ok) {
 
             localStorage.setItem('token', data.token)
-            console.log('executed')
+            // console.log('executed')
             router.push('/dashboard')
-            console.log('executed')
+            // console.log('executed')
 
         } else {
             alert(data.error)
