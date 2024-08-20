@@ -4,7 +4,7 @@ import React, { ReactNode } from 'react'
 
 type CtaButtonProps = {
 	children: string;
-	path: string
+	path?: string
 }
 
 const CtaButton = ({ children, path }: CtaButtonProps) => {

@@ -1,16 +1,17 @@
 'use client'
 
-import { Tab, Tabs } from "@nextui-org/react";
-import 'react-phone-number-input/style.css';
-import CollgePartner from "../form/CollgePartner";
-import TalentHiring from "../form/TalentHiring";
+// import { Tab, Tabs } from "@nextui-org/react";
+// import 'react-phone-number-input/style.css';
+// import CollgePartner from "../form/CollgePartner";
+// import TalentHiring from "../form/TalentHiring";
 
 
 const ContactFrom = () => {
 
     return (
         <div className="content">
-            <Tabs
+            hello
+            {/* <Tabs
                 variant="bordered"
                 color="success"
                 classNames={{
@@ -26,7 +27,7 @@ const ContactFrom = () => {
                 <Tab title="Talent Hiring Company" key={'talent'}>
                     <TalentHiring />
                 </Tab>
-            </Tabs>
+            </Tabs> */}
         </div>
     )
 }
