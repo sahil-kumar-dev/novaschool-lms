@@ -9,36 +9,43 @@ export async function POST(req: Request) {
     try {
         const { email, otp, fullName, password }:{email:string,otp:string,fullName:string,password:string} = await req.json()
 
+        // Check if the OTP is valid and not expired
         const savedOtp = await prisma.otp.findUnique({ where: { email } })
-
-        const compareOtp = await compare(otp, savedOtp!.otp)
-
-        if (!savedOtp || !compareOtp || savedOtp.otpExpires < new Date()) {
-            return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 })
+        if (!savedOtp) {
+            return NextResponse.json({ error: 'No OTP found for this email' }, { status: 404 })
         }
 
+        const compareOtp = await compare(otp, savedOtp.otp)
+        if (!compareOtp) {
+            return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 })
+        }
+
+        if (savedOtp.otpExpires < new Date()) {
+            return NextResponse.json({ error: 'OTP has expired' }, { status: 400 })
+        }
+
+        // Hash the password for user creation
         const hashedPassword = await hash(password, 10)
 
-        // add thumbnail according to the name
-
+        // Generate a thumbnail based on the full name
         const firstName = fullName.split(' ')[0]
         const lastName = fullName.includes(' ') ? fullName.split(' ')[1] : ''
-
         const thumbnail = `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=random`
 
-        // Activate user
+        // Create a new user with the provided details
         const user = await prisma.user.create({
             data: {
                 email,
                 fullName,
-                password:hashedPassword,
-                thumbnail:thumbnail
+                password: hashedPassword,
+                thumbnail: thumbnail
             }
         })
 
-        // Generate JWT token
+        // Generate a JWT token for the user
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' })
 
+        // Set the JWT token as a cookie in the response
         const response = NextResponse.json({ message: 'OTP verified successfully' })
         response.cookies.set({
             name: 'token',
