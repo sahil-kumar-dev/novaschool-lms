@@ -1,27 +1,21 @@
 'use client'
 
+import { useLogout } from '@/hooks/useLogout'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 export default function Component() {
-    const router = useRouter()
+    
+    const logout = useLogout()
 
-    const handleLogout = async () => {
-        const response = await fetch('/api/auth/logout', { method: 'POST' })
-        if (response.ok) {
-            toast.success('Logged out successfully')
-            localStorage.setItem('token', '')
-            router.push('/login')
-        }
-    }
     return (
         <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="mx-auto flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold mb-8">User Dashboard</h1>
                     <button
-                        onClick={handleLogout}
+                        onClick={logout}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     >
                         Logout

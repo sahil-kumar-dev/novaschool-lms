@@ -44,34 +44,34 @@ const Navbar = () => {
                         className='invert w-16 md:w-auto'
                     />
                 </Link>
-                <div className="flex gap-7 items-center">
+                <div className="flex gap-4 items-center">
                     {
-                        profile ?
-                            isLoading ? (
-                                <div>Loading...</div>
-                            ) : (
-                                <Link href={'/dashboard'}>
-                                    <div className="flex gap-2 items-center">
-                                        <Image
-                                            src={profile?.thumbnail || ''}
-                                            alt='profile'
-                                            width={40}
-                                            height={40}
-                                            className='rounded-full'
-                                        />
-                                    </div>
-                                </Link>
-                            )
-                            :
-                            <>
-                                <CtaButton path='/login'>
-                                    Login
-                                </CtaButton>
-                                <CtaButton path='/signup'>
-                                    Sign up
-                                </CtaButton>
-                            </>
+                        profile &&
+                        <Link href={'/dashboard'}>
+                            <div className="flex gap-2 items-center">
+                                <Image
+                                    src={profile?.thumbnail || ''}
+                                    alt='profile'
+                                    width={40}
+                                    height={40}
+                                    className='rounded-full'
+                                />
+                            </div>
+                        </Link>
+
                     }
+                    {
+                        !profile &&
+                        <>
+                            <CtaButton path='/login'>
+                                Login
+                            </CtaButton>
+                            <CtaButton path='/signup'>
+                                Sign up
+                            </CtaButton>
+                        </>
+                    }
+
 
                     <div className="relative">
                         {/* <Dropdown className='mt-8'>

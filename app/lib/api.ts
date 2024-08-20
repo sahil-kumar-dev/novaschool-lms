@@ -28,6 +28,14 @@ export const api = createApi({
             }),
         }),
 
+        // Logout
+        logout: builder.mutation<void, void>({
+            query: () => ({
+                url: 'auth/logout',
+                method: 'POST',
+            }),
+        }),
+
         // Get All Courses query
         getCourses: builder.query<any[], void>({
             query: () => 'courses',
@@ -88,6 +96,7 @@ export const api = createApi({
 export const {
     useLoginMutation,
     useSignupMutation,
+    useLogoutMutation,
     useGetCoursesQuery,
     useGetCourseDetailsQuery,
     useGetMyCoursesQuery,
@@ -96,3 +105,5 @@ export const {
     useGetProfileQuery,
     useUpdateProfileMutation
 } = api
+
+export const resetApiState = api.util.resetApiState
