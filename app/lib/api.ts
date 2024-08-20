@@ -16,6 +16,7 @@ export const api = createApi({
                 method: 'POST',
                 body: credentials,
             }),
+            invalidatesTags: ['Profile']
         }),
 
         // Signup mutation
@@ -65,7 +66,7 @@ export const api = createApi({
             fullName: string
             email: string
             thumbnail: string | ''
-            mobileNumber: string | '' 
+            mobileNumber: string | ''
             accountType: string
         }, void>({
             query: () => 'user/profile',

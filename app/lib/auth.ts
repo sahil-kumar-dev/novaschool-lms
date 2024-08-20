@@ -11,6 +11,7 @@ export function getUser() {
 
     try {
         const decoded = jwt.verify(token.value, process.env.JWT_SECRET || 'secret') as { userId: string }
+
         return decoded.userId
     } catch (error) {
         return null

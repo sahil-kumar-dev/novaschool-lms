@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./lib/providers";
 import { Toaster } from 'sonner'
+import { Footer, Navbar } from "./components/common";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,11 +18,17 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" className="dark" >
             <body className={inter.className}>
                 <Providers>
                     <Toaster richColors />
-                    {children}
+                    <main className="flex min-h-screen flex-col bg-[#111111] ">
+                        <div className="bg-white rounded-[0_0_20px_20px] md:rounded-[0_0_40px_40px] lg:rounded-[0_0_80px_80px] relative">
+                            <Navbar />
+                            {children}
+                        </div>
+                        <Footer />
+                    </main>
                 </Providers>
             </body>
         </html>

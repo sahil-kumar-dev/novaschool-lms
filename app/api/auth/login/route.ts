@@ -12,6 +12,8 @@ export async function POST(req: Request) {
         const { email, password } = await req.json()
         // Fetch the user from the database based on the provided email
         const user = await prisma.user.findUnique({ where: { email } })
+
+        console.log(user)
     
         // If the user is not found, return a 404 error
         if (!user) {
