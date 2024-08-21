@@ -64,7 +64,7 @@ const Navbar = () => {
                             <DropdownMenuTrigger>
                                 <div className="flex gap-2 items-center">
                                     <Image
-                                        src={profile?.thumbnail || ''}
+                                        src={profile?.thumbnail}
                                         alt='profile'
                                         width={40}
                                         height={40}

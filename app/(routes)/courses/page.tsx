@@ -1,32 +1,49 @@
+'use client'
+
+import { useState } from 'react'
+import { useGetCourseQuery } from '@/app/lib/api'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
 import Link from 'next/link'
+import PurchaseModal from '@/app/components/course/PurchaseModal'
 
-// This would typically come from an API or database
-const courses = [
-    { id: 1, title: 'Introduction to React', description: 'Learn the basics of React' },
-    { id: 2, title: 'Advanced JavaScript', description: 'Deep dive into JavaScript concepts' },
-    { id: 3, title: 'Node.js Fundamentals', description: 'Build server-side applications with Node.js' },
-]
+export default function CourseCatalog() {
+    const { data: courses, isLoading } = useGetCourseQuery()
+    const [selectedCourse, setSelectedCourse] = useState(null)
 
-export default function Component() {
+    if (isLoading) {
+        return <Loader2 className="h-8 w-8 animate-spin" />
+    }
+
     return (
-        <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8">All Courses</h1>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {courses.map((course) => (
-                        <div key={course.id} className="bg-white shadow-md rounded-lg p-6">
-                            <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
-                            <p className="text-gray-600 mb-4">{course.description}</p>
-                            <Link
-                                href={`/courses/${course.id}`}
-                                className="text-indigo-600 hover:text-indigo-800 font-medium"
-                            >
-                                View Details
+        <div className="container mx-auto p-4">
+            <h1 className="text-3xl font-bold mb-6">Course Catalog</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {courses?.map((course) => (
+                    <Card key={course.id}>
+                        <CardHeader>
+                            <CardTitle>{course.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-gray-600">{course.description}</p>
+                            <p className="text-lg font-bold mt-2">₹{course.price}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                            <Link href={`/courses/${course.id}`}>
+                                <Button variant="outline">View Details</Button>
                             </Link>
-                        </div>
-                    ))}
-                </div>
+                            <Button onClick={() => setSelectedCourse(course)}>Purchase</Button>
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
+            {selectedCourse && (
+                <PurchaseModal
+                    course={selectedCourse}
+                    onClose={() => setSelectedCourse(null)}
+                />
+            )}
         </div>
     )
 }

@@ -1,23 +1,53 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import jwt from 'jsonwebtoken'
+import { PrismaClient } from '@prisma/client'
+import { verifyAuth } from './app/lib/auth'
 
-export function middleware(request: NextRequest) {
+const prisma = new PrismaClient()
+
+interface DecodedToken {
+    userId: string
+    iat: number
+    exp: number
+}
+
+export async function middleware(request: NextRequest) {
     const token = request.cookies.get('token')?.value
 
 
-    // If the user is logged in and trying to access login or signup pages
-    if (token && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-    // If the user is not logged in and trying to access dashboard or courses pages
-    if (!token && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/signup')) {
+    if (!token) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
+    const user = await verifyAuth(token)
 
-    return NextResponse.next()
+    if (!user) {
+        return NextResponse.redirect(new URL('/login', request.url))
+    }
+
+    console.log('middleware', user)
+
+    // Check for admin routes
+    if (request.nextUrl.pathname.startsWith('/admin') && user.accountType !== 'ADMIN') {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('user', JSON.stringify(user))
+    requestHeaders.set('x-user-id', user.id)
+    requestHeaders.set('x-user-email', user.email)
+    requestHeaders.set('x-user-account-type', user.accountType)
+
+    console.log(requestHeaders)
+
+    return NextResponse.next({
+        request: {
+            headers: requestHeaders,
+        },
+    })
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/courses/:path*','/user/:path*'],
+    matcher: ['/dashboard/:path*', '/admin/:path*', '/api/admin/:path*', '/profile/:path*'],
 }

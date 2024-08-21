@@ -1,16 +1,18 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { getUser } from '@/app/lib/auth'
 import { revalidatePath } from 'next/cache'
+import { verifyAuth } from '@/app/lib/auth'
 
 const prisma = new PrismaClient()
 
 // Function to handle GET request for user profile
-export async function GET() {
+export async function GET(request: NextRequest) {
     // Retrieve the user from the session
-    const user = getUser()
 
-    // If no user is found, return an unauthorized error
+    const token = request.cookies.get('token')?.value
+
+    const user = await verifyAuth(token!)
+
     if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -18,7 +20,7 @@ export async function GET() {
     try {
         // Fetch user details from the database
         const userDetails = await prisma.user.findUnique({
-            where: { id: user },
+            where: { id: user.id },
             select: {
                 fullName: true,
                 email: true,
@@ -39,18 +41,21 @@ export async function GET() {
 }
 
 // Function to handle PUT request for updating user profile
-export async function PUT(req: Request) {
+export async function PUT(request: Request) {
     // Retrieve the user from the session
-    const user = getUser()
 
-    // If no user is found, return an unauthorized error
+    const token = request.cookies.get('token')?.value
+
+    const user :{ id:string,email:string,acccountType:string} = await verifyAuth(token!)
+
     if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+
     try {
         // Parse the request form data
-        const formData = await req.formData()
+        const formData = await request.formData()
         const fullName = formData.get('fullName') as string
         const mobileNumber = formData.get('mobileNumber') as string
         const photo = formData.get('photo') as File | null
@@ -68,7 +73,7 @@ export async function PUT(req: Request) {
 
         // Update the user details in the database
         const updatedUser = await prisma.user.update({
-            where: { id: user },
+            where: { id: user.id },
             data: {
                 fullName,
                 mobileNumber,
@@ -77,7 +82,6 @@ export async function PUT(req: Request) {
         })
 
         // Revalidate the profile path to ensure the updated profile is reflected
-        revalidatePath('/profile')
         // Return a success message
         return NextResponse.json({ message: 'Profile updated successfully' })
 

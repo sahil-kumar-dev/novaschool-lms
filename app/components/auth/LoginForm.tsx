@@ -10,22 +10,18 @@ export default function Component() {
     const [password, setPassword] = useState('')
     const router = useRouter()
 
-    const [login,{isLoading,isError}] = useLoginMutation()
+    const [login, { isLoading, isError }] = useLoginMutation()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const response = await login({ email, password }).unwrap()
-        
-            localStorage.setItem('token', response.token)
-            // console.log('executed')
-            router.push('/dashboard')
-            // console.log('executed')
-            
-            toast.success(response.message)
-            
-        } catch (error:any) {
-            toast.error(error?.data?.error)
+            const result = await login({ email, password }).unwrap()
+            if (result.success) {
+                router.push(result.redirectUrl)
+            }
+        } catch (error) {
+            console.error('Failed to log in:', error)
+            // Handle login error (show error message to user)
         }
     }
 
@@ -61,7 +57,7 @@ export default function Component() {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-                {isLoading ?'Logging In':'Login'}
+                {isLoading ? 'Logging In' : 'Login'}
             </button>
         </form>
     )

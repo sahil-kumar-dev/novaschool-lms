@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 import {compare, hash} from 'bcryptjs'
+import { randomUUID } from 'crypto'
+import { generateToken } from '@/app/lib/auth'
 
 const prisma = new PrismaClient()
 
@@ -35,6 +37,7 @@ export async function POST(req: Request) {
         // Create a new user with the provided details
         const user = await prisma.user.create({
             data: {
+                id:randomUUID(),
                 email,
                 fullName,
                 password: hashedPassword,
@@ -43,7 +46,8 @@ export async function POST(req: Request) {
         })
 
         // Generate a JWT token for the user
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' })
+        // const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' })
+        const token = generateToken(user.id)
 
         // Set the JWT token as a cookie in the response
         const response = NextResponse.json({ message: 'OTP verified successfully' })

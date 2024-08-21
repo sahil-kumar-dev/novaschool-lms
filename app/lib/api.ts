@@ -4,13 +4,13 @@ export const api = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: '/api',
     }),
-    tagTypes: ['Profile'],
+    tagTypes: ['Profile', 'Course', 'Stats', 'User'],
     endpoints: (builder) => ({
 
         // Define your API endpoints here
 
         // Login mutation
-        login: builder.mutation<{ message: string, token: string, success: boolean, error: string }, { email: string; password: string }>({
+        login: builder.mutation<{ success: boolean; redirectUrl: string }, { email: string; password: string }>({
             query: (credentials) => ({
                 url: 'auth/login',
                 method: 'POST',
@@ -34,21 +34,6 @@ export const api = createApi({
                 url: 'auth/logout',
                 method: 'POST',
             }),
-        }),
-
-        // Get All Courses query
-        getCourses: builder.query<any[], void>({
-            query: () => 'courses',
-        }),
-
-        // Get Course Details query
-        getCourseDetails: builder.query<any, string>({
-            query: (id) => `courses/${id}`,
-        }),
-
-        // Get My Courses query
-        getMyCourses: builder.query<any[], void>({
-            query: () => 'dashboard/my-courses',
         }),
 
         // Verify OTP mutation
@@ -89,7 +74,79 @@ export const api = createApi({
                 body: profileData,
             }),
             invalidatesTags: ['Profile']
-        })
+        }),
+
+        // Get Admin Stats query
+        getAdminStats: builder.query<AdminStats, void>({
+            query: () => 'admin/stats',
+            providesTags: ['Stats'],
+        }),
+
+        // Create Course mutation
+        createCourse: builder.mutation<{ id: string }, FormData>({
+            query: (courseData) => ({
+                url: 'admin/courses',
+                method: 'POST',
+                body: courseData,
+            }),
+            invalidatesTags: ['Course', 'Stats'],
+        }),
+
+        // Get All Users query
+        getUsers: builder.query<User[], void>({
+            query: () => 'admin/users',
+            providesTags: ['User'],
+        }),
+
+        // Get Course Stats query
+        getCourseStats: builder.query<CourseStats, string>({
+            query: (courseId) => `admin/courses/${courseId}/stats`,
+            providesTags: ['Stats'],
+        }),
+
+        // Get All Courses query
+        getAllCourses: builder.query<Course[], void>({
+            query: () => 'course',
+            providesTags: ['Course'],
+        }),
+
+        // Get Course Details query
+        getCourseDetails: builder.query<CourseDetails, string>({
+            query: (id) => `courses/${id}`,
+            providesTags: ['Course'],
+        }),
+
+        // Get Course query
+        getCourse: builder.query<Course[], void>({
+            query: () => 'courses',
+            providesTags: ['Course'],
+        }),
+        purchaseCourse: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `courses/${id}/purchase`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Course'],
+        }),
+
+        // Initiate Payment mutation
+        initiatePayment: builder.mutation<{ orderId: string, amount: number }, { courseId: string }>({
+            query: (data) => ({
+                url: 'payments/initiate',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
+        // Verify Payment mutation
+        verifyPayment: builder.mutation<{ success: boolean }, VerifyPaymentData>({
+            query: (data) => ({
+                url: 'payments/verify',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['User', 'Stats'],
+        }),
     }),
 })
 
@@ -97,13 +154,68 @@ export const {
     useLoginMutation,
     useSignupMutation,
     useLogoutMutation,
-    useGetCoursesQuery,
     useGetCourseDetailsQuery,
-    useGetMyCoursesQuery,
     useVerifyOtpMutation,
     useResendOtpMutation,
     useGetProfileQuery,
-    useUpdateProfileMutation
+    useUpdateProfileMutation,
+    useGetAdminStatsQuery,
+    useCreateCourseMutation,
+    useGetAllCoursesQuery,
+    useGetUsersQuery,
+    useGetCourseStatsQuery,
+    useGetCourseQuery,
+    useInitiatePaymentMutation,
+    useVerifyPaymentMutation,
+    usePurchaseCourseMutation,
 } = api
 
 export const resetApiState = api.util.resetApiState
+
+
+// Add type definitions
+interface AdminStats {
+    totalUsers: number
+    totalCourses: number
+    totalEnrollments: number
+    totalRevenue: number
+}
+
+interface User {
+    id: string
+    fullName: string
+    email: string
+    accountType: string
+    enrolledCourses: number
+}
+
+interface CourseStats {
+    totalEnrollments: number
+    totalRevenue: number
+    averageRating: number
+}
+
+interface Course {
+    id: string
+    title: string
+    description: string
+    price: number
+}
+
+interface VerifyPaymentData {
+    razorpay_payment_id: string
+    razorpay_order_id: string
+    razorpay_signature: string
+}
+
+interface CourseDetails extends Course {
+    isEnrolled: boolean
+    sections: {
+      id: string
+      title: string
+      subsections: {
+        id: string
+        title: string
+      }[]
+    }[]
+  }

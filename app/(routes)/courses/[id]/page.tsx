@@ -1,39 +1,53 @@
+'use client'
+
+import { useGetCourseDetailsQuery } from '@/app/lib/api'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
 import Link from 'next/link'
 
-// This would typically come from an API or database
-const getCourse = (id: string) => ({
-    id,
-    title: 'Introduction to React',
-    description: 'Learn the basics of React',
-    lectures: [
-        { id: 1, title: 'React Components' },
-        { id: 2, title: 'State and Props' },
-        { id: 3, title: 'Hooks' },
-    ],
-})
+export default function CourseDetails({ params }: { params: { id: string } }) {
+    const { data: course, isLoading } = useGetCourseDetailsQuery(params.id)
 
-export default function Component({ params }: { params: { id: string } }) {
-    const course = getCourse(params.id)
+    if (isLoading) {
+        return <Loader2 className="h-8 w-8 animate-spin" />
+    }
+
+    if (!course) {
+        return <div>Course not found</div>
+    }
 
     return (
-        <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto">
-                <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
-                <p className="text-gray-600 mb-8">{course.description}</p>
-                <h2 className="text-2xl font-semibold mb-4">Lectures</h2>
-                <ul className="space-y-2">
-                    {course.lectures.map((lecture) => (
-                        <li key={lecture.id}>
-                            <Link
-                                href={`/courses/${course.id}/lectures/${lecture.id}`}
-                                className="text-indigo-600 hover:text-indigo-800"
-                            >
-                                {lecture.title}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </div>
+        <div className="container mx-auto p-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>{course.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600 mb-4">{course.description}</p>
+                    <p className="text-lg font-bold mb-4">Price: ₹{course.price}</p>
+                    <h3 className="text-xl font-semibold mb-2">Course Content:</h3>
+                    <ul className="list-disc pl-5 mb-4">
+                        {course.sections.map((section) => (
+                            <li key={section.id}>
+                                {section.title}
+                                <ul className="list-circle pl-5">
+                                    {section.subsections.map((subsection) => (
+                                        <li key={subsection.id}>{subsection.title}</li>
+                                    ))}
+                                </ul>
+                            </li>
+                        ))}
+                    </ul>
+                    {course.isEnrolled ? (
+                        <Link href={`/dashboard/courses/${course.id}`}>
+                            <Button>Go to Course</Button>
+                        </Link>
+                    ) : (
+                        <Button>Purchase Course</Button>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     )
 }

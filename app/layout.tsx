@@ -5,6 +5,7 @@ import { Providers } from "./lib/providers";
 import { Toaster } from 'sonner'
 import { Footer, Navbar } from "./components/common";
 import NextTopLoader from 'nextjs-toploader';
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +26,7 @@ export default function RootLayout({
                     <NextTopLoader
                         color="#000"
                         showSpinner={false}
-                     />
+                    />
                     <Toaster richColors />
                     <main className="flex min-h-screen flex-col bg-[#111111] ">
                         <div className="bg-white rounded-[0_0_20px_20px] md:rounded-[0_0_40px_40px] lg:rounded-[0_0_80px_80px] relative">
@@ -34,6 +35,10 @@ export default function RootLayout({
                         </div>
                         <Footer />
                     </main>
+                    <Script
+                        src="https://checkout.razorpay.com/v1/checkout.js"
+                        strategy="lazyOnload"
+                    />
                 </Providers>
             </body>
         </html>
